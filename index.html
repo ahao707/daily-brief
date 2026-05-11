@@ -3,68 +3,958 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>每日简报 · 初始化中</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Noto+Serif+SC:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<title>每日简报 · The Daily Brief</title>
+<meta name="description" content="AI 与世界，一日一读">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --bg: #ebe2cd;
+    --bg-tint: #f1eada;
+    --paper: #f7f1df;
+    --ink: #1a1410;
+    --ink-soft: #58493a;
+    --ink-faint: #8b7a64;
+    --rule: #bfae8e;
+    --rule-soft: #d8c9a8;
+    --red: #b8362a;
+    --red-deep: #8a2419;
+    --blue: #2a3e5e;
+    --gold: #a8842c;
+    --green: #3d5a3a;
+
+    --font-display: 'Fraunces', 'Noto Serif SC', Georgia, serif;
+    --font-body: 'Noto Sans SC', -apple-system, sans-serif;
+    --font-serif: 'Fraunces', 'Noto Serif SC', Georgia, serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
   body {
-    background: #ebe2cd;
-    color: #1a1410;
-    font-family: 'Noto Serif SC', serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
     min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.35;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.15 0 0 0 0 0.1 0 0 0 0 0.05 0 0 0 0.4 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: multiply;
+  }
+
+  .wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 40px 80px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ===== 报头 ===== */
+  .masthead {
+    border-top: 6px double var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 18px 0 10px;
+    margin-bottom: 8px;
+  }
+
+  .meta-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule-soft);
+    margin-bottom: 22px;
+  }
+
+  .meta-bar > div { display: flex; gap: 18px; flex-wrap: wrap; }
+
+  .meta-pill { color: var(--red); font-weight: 700; }
+
+  .title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(56px, 9vw, 110px);
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+    text-align: center;
+    font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 1;
+  }
+
+  .title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--red-deep);
+    font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  }
+
+  .subtitle {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 18px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-top: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .subtitle::before, .subtitle::after {
+    content: "—";
+    color: var(--rule);
+    margin: 0 16px;
+  }
+
+  /* ===== 过滤器 ===== */
+  .filters {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin: 32px 0 40px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 12px 0;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 8px 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 2px;
+  }
+
+  .filter-btn:hover { color: var(--ink); background: var(--bg-tint); }
+  .filter-btn.active { background: var(--ink); color: var(--paper); }
+
+  /* ===== 板块 ===== */
+  .section { margin: 60px 0 0; }
+  .section.hidden { display: none; }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .section-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 42px;
+    letter-spacing: -0.02em;
+    font-variation-settings: "opsz" 100, "SOFT" 30, "WONK" 0;
+  }
+
+  .section-title .accent {
+    color: var(--red);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .section-head::before, .section-head::after {
+    content: '';
+    height: 1px;
+    background: var(--ink);
+  }
+
+  /* ===== 文章网格 ===== */
+  .lede {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 48px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 40px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 48px 36px;
+  }
+
+  article { position: relative; }
+
+  article a.titlelink {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+  }
+
+  .kicker {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 12px;
+    padding: 3px 0;
+    border-bottom: 1px solid var(--red);
+  }
+
+  .kicker.blue { color: var(--blue); border-color: var(--blue); }
+  .kicker.green { color: var(--green); border-color: var(--green); }
+
+  .headline {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+    font-variation-settings: "opsz" 60, "SOFT" 20, "WONK" 0;
+    transition: color 0.2s ease;
+  }
+
+  .lede .headline { font-size: 44px; line-height: 1.05; }
+  .lede .lede-side .headline { font-size: 26px; }
+  .grid .headline { font-size: 22px; }
+
+  article:hover .headline { color: var(--red-deep); }
+
+  .dek {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 16px;
+  }
+
+  .lede .dek { font-size: 17px; }
+
+  .byline {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.05em;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px dotted var(--rule);
+    flex-wrap: wrap;
+  }
+
+  .byline .source { color: var(--ink); font-weight: 500; }
+  .byline .dot { color: var(--rule); }
+
+  .lede-side {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .lede-side article {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .lede-side article:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  /* ===== 视频卡片 ===== */
+  .video-thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    margin-bottom: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--ink);
+    border: 1px solid var(--rule);
+    box-shadow: 4px 4px 0 var(--rule-soft);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .video-thumb:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--rule);
+  }
+
+  .video-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .video-thumb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+  }
+
+  .play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px;
+    height: 64px;
+    background: var(--red);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0;
-    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .video-thumb:hover .play-btn {
+    transform: translate(-50%, -50%) scale(1.1);
+    background: var(--red-deep);
+  }
+
+  .play-btn::before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 16px solid var(--paper);
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+    margin-left: 5px;
+  }
+
+  .video-label {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: var(--red);
+    color: var(--paper);
+    padding: 3px 10px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    z-index: 2;
+  }
+
+  /* iframe 替换缩略图后的状态 */
+  .video-thumb.playing { cursor: default; }
+  .video-thumb.playing iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* ===== 装饰 ===== */
+  .ornament {
     text-align: center;
-  }
-  .box { max-width: 580px; }
-  h1 {
-    font-family: 'Fraunces', 'Noto Serif SC', serif;
-    font-size: clamp(48px, 8vw, 80px);
-    font-weight: 900;
-    line-height: 0.95;
-    letter-spacing: -0.03em;
-    margin: 0 0 24px;
-  }
-  h1 em { font-style: italic; color: #8a2419; font-weight: 400; }
-  p { font-size: 18px; line-height: 1.7; color: #58493a; }
-  .pulse {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    background: #b8362a;
-    border-radius: 50%;
-    margin-right: 8px;
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-  code {
-    font-family: 'JetBrains Mono', monospace;
-    background: #f1eada;
-    padding: 2px 8px;
+    margin: 40px 0;
+    font-family: var(--font-serif);
+    color: var(--rule);
+    letter-spacing: 1em;
     font-size: 14px;
-    border-radius: 3px;
   }
-  .hint {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: #8b7a64;
-    margin-top: 32px;
+
+  /* ===== 空状态 ===== */
+  .empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--ink-faint);
+    font-style: italic;
+    font-family: var(--font-serif);
+    font-size: 18px;
+  }
+
+  /* ===== 页脚 ===== */
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 6px double var(--ink);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-soft);
     letter-spacing: 0.05em;
   }
+
+  footer .col h4 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+    font-style: italic;
+  }
+
+  footer .col p { line-height: 1.7; }
+  footer a { color: var(--red); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 900px) {
+    .wrap { padding: 24px 20px 60px; }
+    .lede { grid-template-columns: 1fr; gap: 32px; }
+    .lede .headline { font-size: 32px; }
+    .lede .lede-side .headline { font-size: 22px; }
+    .grid { grid-template-columns: 1fr; gap: 32px; }
+    .section-title { font-size: 30px; }
+    .section-head { grid-template-columns: 1fr auto; }
+    .section-head::before { display: none; }
+    footer { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .meta-bar { flex-direction: column; gap: 10px; align-items: flex-start; }
+    .meta-bar > div { gap: 12px; }
+    .subtitle::before, .subtitle::after { display: none; }
+  }
+
+  /* 入场动画 */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  article, .section-head, .lede { animation: rise 0.5s ease both; }
+  .section-head { animation-delay: 0.05s; }
+  article:nth-child(1) { animation-delay: 0.1s; }
+  article:nth-child(2) { animation-delay: 0.15s; }
+  article:nth-child(3) { animation-delay: 0.2s; }
+  article:nth-child(4) { animation-delay: 0.25s; }
 </style>
 </head>
 <body>
-<div class="box">
-  <h1>每日<em>简</em>报</h1>
-  <p><span class="pulse"></span>初始化中…</p>
-  <p>首次部署完成。手动触发一次 <code>Update Daily Brief</code> workflow，<br>
-  或等明天的定时任务跑完，这页会被替换成今日内容。</p>
-  <p class="hint">→ Actions 标签 → Update Daily Brief → Run workflow</p>
+<div class="wrap">
+
+  <!-- ============ 报头 ============ -->
+  <header class="masthead">
+    <div class="meta-bar">
+      <div>
+        <span>The Daily Brief</span>
+        <span class="meta-pill">● LIVE</span>
+        <span>2026年5月11日 · 星期一</span>
+      </div>
+      <div>
+        <span>每日自动更新</span>
+        <span>最近一次：2026-05-11 12:32</span>
+      </div>
+    </div>
+    <h1 class="title">每日<em>简</em>报</h1>
+    <p class="subtitle">AI 与世界，一日一读</p>
+  </header>
+
+  <!-- ============ 过滤器 ============ -->
+  <nav class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">全部</button>
+    <button class="filter-btn" data-filter="ai">AI 圈</button>
+    <button class="filter-btn" data-filter="world">全球</button>
+    <button class="filter-btn" data-filter="video">📺 仅看视频</button>
+  </nav>
+
+
+
+  <!-- ============ AI 圈 ============ -->
+      <section class="section" data-category="ai">
+      <div class="section-head">
+        <span class="section-num">№ 01</span>
+        <h2 class="section-title">AI <span class="accent">圈</span></h2>
+        <span class="section-num">Artificial Intelligence</span>
+      </div>
+
+          <div class="lede">
+            <div class="lede-main">
+                  <article class="news-item" data-category="ai" data-video="0">
+
+
+      <a class="titlelink" href="https://www.openculture.com/2024/10/the-greatest-shot-in-television.html" target="_blank" rel="noopener">
+        <span class="kicker ">
+AI · Hacker News (前页)
+        </span>
+        <h3 class="headline">The Greatest Shot in Television: James Burke Had One Chance to Nail This Scene</h3>
+          <p class="dek">Article URL: https://www.openculture.com/2024/10/the-greatest-shot-in-television.html Comments URL: https://news.ycombinator.com/item?id=48090521 Points: 41 # Comments: 14</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">Hacker News (前页)</span>
+        <span class="dot">·</span>
+        <span>1 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://www.openculture.com/2024/10/the-greatest-shot-in-television.html" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+            </div>
+              <div class="lede-side">
+                      <article class="news-item" data-category="ai" data-video="0">
+
+
+      <a class="titlelink" href="https://www.jamesshore.com/v2/blog/2026/you-need-ai-that-reduces-your-maintenance-costs" target="_blank" rel="noopener">
+        <span class="kicker ">
+AI · Hacker News (前页)
+        </span>
+        <h3 class="headline">An AI coding agent, used to write code, needs to reduce your maintenance costs</h3>
+          <p class="dek">Article URL: https://www.jamesshore.com/v2/blog/2026/you-need-ai-that-reduces-your-maintenance-costs Comments URL: https://news.ycombinator.com/item?id=48089289 Points: 73 # Comments: 12</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">Hacker News (前页)</span>
+        <span class="dot">·</span>
+        <span>4 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://www.jamesshore.com/v2/blog/2026/you-need-ai-that-reduces-your-maintenance-costs" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+                      <article class="news-item" data-category="ai" data-video="0">
+
+
+      <a class="titlelink" href="https://kotaku.com/playstation-3-emulator-devs-politely-ask-that-people-stop-flooding-it-with-ai-code-pull-requests-2000694656" target="_blank" rel="noopener">
+        <span class="kicker ">
+AI · Hacker News (前页)
+        </span>
+        <h3 class="headline">PS3 Emulator Devs Politely Ask That People Stop Flooding It with AI PRs</h3>
+          <p class="dek">Article URL: https://kotaku.com/playstation-3-emulator-devs-politely-ask-that-people-stop-flooding-it-with-ai-code-pull-requests-2000694656 Comments URL: https://news.ycombinator.com/item?id=48089263…</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">Hacker News (前页)</span>
+        <span class="dot">·</span>
+        <span>4 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://kotaku.com/playstation-3-emulator-devs-politely-ask-that-people-stop-flooding-it-with-ai-code-pull-requests-2000694656" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+              </div>
+          </div>
+
+          <div class="grid">
+                  <article class="news-item" data-category="ai" data-video="0">
+
+
+      <a class="titlelink" href="https://dunkels.com/adam/claude-user-space-ip-stack-ping/" target="_blank" rel="noopener">
+        <span class="kicker ">
+AI · Hacker News (前页)
+        </span>
+        <h3 class="headline">How Fast Does Claude, Acting as a User Space IP Stack, Respond to Pings?</h3>
+          <p class="dek">Article URL: https://dunkels.com/adam/claude-user-space-ip-stack-ping/ Comments URL: https://news.ycombinator.com/item?id=48089049 Points: 25 # Comments: 4</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">Hacker News (前页)</span>
+        <span class="dot">·</span>
+        <span>5 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://dunkels.com/adam/claude-user-space-ip-stack-ping/" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+                  <article class="news-item" data-category="ai" data-video="0">
+
+
+      <a class="titlelink" href="https://cyber.netsecops.io/articles/obsidian-plugin-abused-in-campaign-to-deploy-phantom-pulse-rat/" target="_blank" rel="noopener">
+        <span class="kicker ">
+AI · Hacker News (前页)
+        </span>
+        <h3 class="headline">Obsidian plugin was abused to deploy a remote access trojan</h3>
+          <p class="dek">Article URL: https://cyber.netsecops.io/articles/obsidian-plugin-abused-in-campaign-to-deploy-phantom-pulse-rat/ Comments URL: https://news.ycombinator.com/item?id=48088576 Points: 116 # Comments: 64</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">Hacker News (前页)</span>
+        <span class="dot">·</span>
+        <span>6 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://cyber.netsecops.io/articles/obsidian-plugin-abused-in-campaign-to-deploy-phantom-pulse-rat/" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+                  <article class="news-item" data-category="ai" data-video="0">
+
+
+      <a class="titlelink" href="https://www.tomshardware.com/tech-industry/artificial-intelligence/maryland-citizens-slapped-with-usd2-billion-grid-upgrade-bill-for-out-of-state-ai-data-centers-state-complains-to-federal-energy-regulators-says-additional-cost-breaks-ratepayer-protection-pledge-promises" target="_blank" rel="noopener">
+        <span class="kicker ">
+AI · Hacker News (前页)
+        </span>
+        <h3 class="headline">Maryland citizens hit with $2B power grid upgrade for out-of-state AI</h3>
+          <p class="dek">Article URL:…</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">Hacker News (前页)</span>
+        <span class="dot">·</span>
+        <span>7 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://www.tomshardware.com/tech-industry/artificial-intelligence/maryland-citizens-slapped-with-usd2-billion-grid-upgrade-bill-for-out-of-state-ai-data-centers-state-complains-to-federal-energy-regulators-says-additional-cost-breaks-ratepayer-protection-pledge-promises" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+                  <article class="news-item" data-category="ai" data-video="0">
+
+
+      <a class="titlelink" href="https://techcrunch.com/2026/05/10/get-ready-for-the-whisper-filled-office-of-the-future/" target="_blank" rel="noopener">
+        <span class="kicker ">
+AI · TechCrunch AI
+        </span>
+        <h3 class="headline">Get ready for the whisper-filled office of the future</h3>
+          <p class="dek">How will work setups change if we spend more and more time talking to our computers?</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">TechCrunch AI</span>
+        <span class="dot">·</span>
+        <span>7 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://techcrunch.com/2026/05/10/get-ready-for-the-whisper-filled-office-of-the-future/" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+                  <article class="news-item" data-category="ai" data-video="0">
+
+
+      <a class="titlelink" href="https://techcrunch.com/2026/05/10/anthropic-says-evil-portrayals-of-ai-were-responsible-for-claudes-blackmail-attempts/" target="_blank" rel="noopener">
+        <span class="kicker ">
+AI · TechCrunch AI
+        </span>
+        <h3 class="headline">Anthropic says ‘evil’ portrayals of AI were responsible for Claude’s blackmail attempts</h3>
+          <p class="dek">Fictional portrayals of artificial intelligence can have a real effect on AI models, according to Anthropic.</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">TechCrunch AI</span>
+        <span class="dot">·</span>
+        <span>7 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://techcrunch.com/2026/05/10/anthropic-says-evil-portrayals-of-ai-were-responsible-for-claudes-blackmail-attempts/" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+                  <article class="news-item" data-category="ai" data-video="0">
+
+
+      <a class="titlelink" href="https://unix.foo/posts/local-ai-needs-to-be-norm/" target="_blank" rel="noopener">
+        <span class="kicker ">
+AI · Hacker News (前页)
+        </span>
+        <h3 class="headline">Local AI needs to be the norm</h3>
+          <p class="dek">Article URL: https://unix.foo/posts/local-ai-needs-to-be-norm/ Comments URL: https://news.ycombinator.com/item?id=48085821 Points: 755 # Comments: 347</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">Hacker News (前页)</span>
+        <span class="dot">·</span>
+        <span>11 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://unix.foo/posts/local-ai-needs-to-be-norm/" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+          </div>
+    </section>
+
+
+  <div class="ornament">✦ ✦ ✦</div>
+
+  <!-- ============ 全球 ============ -->
+      <section class="section" data-category="world">
+      <div class="section-head">
+        <span class="section-num">№ 02</span>
+        <h2 class="section-title">全球 <span class="accent">动态</span></h2>
+        <span class="section-num">World News</span>
+      </div>
+
+          <div class="lede">
+            <div class="lede-main">
+                  <article class="news-item" data-category="world" data-video="0">
+
+
+      <a class="titlelink" href="https://www.theguardian.com/australia-news/live/2026/may/11/australia-politics-live-federal-budget-jim-chalmers-cost-of-living-deficit-farrer-byelection-coalition-one-nation-ntwnfb" target="_blank" rel="noopener">
+        <span class="kicker blue">
+全球 · The Guardian World
+        </span>
+        <h3 class="headline">Australian politics live: Chris Minns says NSW Labor has ‘nine months’ to win back voters planning to switch to One Nation</h3>
+          <p class="dek">Follow live updatesGet our breaking news email, free app or daily news podcast‘We’re not a party of government … yet,’ says JoyceBarnaby Joyce is doing something of a victory lap for One Nation this…</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">The Guardian World</span>
+        <span class="dot">·</span>
+        <span>26 分钟前</span>
+        <span class="dot">·</span>
+        <a href="https://www.theguardian.com/australia-news/live/2026/may/11/australia-politics-live-federal-budget-jim-chalmers-cost-of-living-deficit-farrer-byelection-coalition-one-nation-ntwnfb" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+            </div>
+              <div class="lede-side">
+                      <article class="news-item" data-category="world" data-video="0">
+
+
+      <a class="titlelink" href="https://www.theguardian.com/world/2026/may/11/greece-explosive-packed-drone-lefkada-western-coast" target="_blank" rel="noopener">
+        <span class="kicker blue">
+全球 · The Guardian World
+        </span>
+        <h3 class="headline">Greece scrambles to explain how explosive-packed drone landed in its waters</h3>
+          <p class="dek">Minister defends preparedness against novel threat after officials detonate device suspected to be from UkraineAuthorities in Greece have intensified investigations into how an explosive-packed drone…</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">The Guardian World</span>
+        <span class="dot">·</span>
+        <span>32 分钟前</span>
+        <span class="dot">·</span>
+        <a href="https://www.theguardian.com/world/2026/may/11/greece-explosive-packed-drone-lefkada-western-coast" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+                      <article class="news-item" data-category="world" data-video="0">
+
+
+      <a class="titlelink" href="https://www.bbc.com/news/articles/c99l1590kr0o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener">
+        <span class="kicker blue">
+全球 · BBC World
+        </span>
+        <h3 class="headline">Thailand&#39;s divisive ex-PM is out of jail, but is the Thaksin era over?</h3>
+          <p class="dek">Thaksin seems incapable of taking a back seat. This time, it really could be different.</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">BBC World</span>
+        <span class="dot">·</span>
+        <span>51 分钟前</span>
+        <span class="dot">·</span>
+        <a href="https://www.bbc.com/news/articles/c99l1590kr0o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+              </div>
+          </div>
+
+          <div class="grid">
+                  <article class="news-item" data-category="world" data-video="0">
+
+
+      <a class="titlelink" href="https://www.bbc.com/news/articles/c3r2p70jdy7o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener">
+        <span class="kicker blue">
+全球 · BBC World
+        </span>
+        <h3 class="headline">French national shows symptoms on return from hantavirus-hit ship</h3>
+          <p class="dek">Five passengers of the MV Hondius will be quarantined in Paris &#34;until further notice&#34;, France&#39;s prime minister says.</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">BBC World</span>
+        <span class="dot">·</span>
+        <span>1 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://www.bbc.com/news/articles/c3r2p70jdy7o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+                  <article class="news-item" data-category="world" data-video="0">
+
+
+      <a class="titlelink" href="https://www.theguardian.com/australia-news/2026/may/11/antony-catalano-wife-assault-charges-excused-attending-court-ntwnfb" target="_blank" rel="noopener">
+        <span class="kicker blue">
+全球 · The Guardian World
+        </span>
+        <h3 class="headline">Antony Catalano: media mogul accused of assaulting wife excused from attending court due to fears over press scrutiny</h3>
+          <p class="dek">Catalano’s lawyer says press attention ‘potentially detrimental’ to Australian Community Media co-owner’s mental healthGet our breaking news email, free app or daily news podcastA media mogul charged…</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">The Guardian World</span>
+        <span class="dot">·</span>
+        <span>1 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://www.theguardian.com/australia-news/2026/may/11/antony-catalano-wife-assault-charges-excused-attending-court-ntwnfb" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+                  <article class="news-item" data-category="world" data-video="0">
+
+
+      <a class="titlelink" href="https://www.theguardian.com/us-news/2026/may/10/americans-hantavirus-cruise-ship-repatriated" target="_blank" rel="noopener">
+        <span class="kicker blue">
+全球 · The Guardian World
+        </span>
+        <h3 class="headline">Americans onboard hantavirus cruise ship to be repatriated to US</h3>
+          <p class="dek">The 17 passengers to be transferred to a quarantine center in Nebraska to ‘assess them for risk’, as one tests positive and another shows symptomsThe 17 Americans onboard the hantavirus-stricken…</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">The Guardian World</span>
+        <span class="dot">·</span>
+        <span>1 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://www.theguardian.com/us-news/2026/may/10/americans-hantavirus-cruise-ship-repatriated" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+                  <article class="news-item" data-category="world" data-video="0">
+
+
+      <a class="titlelink" href="https://www.theguardian.com/world/2026/may/11/polish-ex-minister-zbigniew-ziobro-flees-hungary-usa" target="_blank" rel="noopener">
+        <span class="kicker blue">
+全球 · The Guardian World
+        </span>
+        <h3 class="headline">Polish ex-minister flees Hungary to the US after PM Magyar says country won’t protect people wanted elsewhere</h3>
+          <p class="dek">Zbigniew Ziobro has been accused in Poland of leading an organised criminal enterprise and abuse of power, which he deniesPoland’s former justice minister Zbigniew Ziobro, wanted on several criminal…</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">The Guardian World</span>
+        <span class="dot">·</span>
+        <span>1 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://www.theguardian.com/world/2026/may/11/polish-ex-minister-zbigniew-ziobro-flees-hungary-usa" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+                  <article class="news-item" data-category="world" data-video="0">
+
+
+      <a class="titlelink" href="https://www.aljazeera.com/video/newsfeed/2026/5/11/gaza-documentary-dropped-by-the-bbc-wins-bafta?traffic_source=rss" target="_blank" rel="noopener">
+        <span class="kicker blue">
+全球 · Al Jazeera
+        </span>
+        <h3 class="headline">Gaza documentary dropped by the BBC wins BAFTA</h3>
+          <p class="dek">A documentary exposing Israel&#39;s attacks on Gaza&#39;s health system and personnel won Best Current Affairs at the BAFTAs.</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">Al Jazeera</span>
+        <span class="dot">·</span>
+        <span>1 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://www.aljazeera.com/video/newsfeed/2026/5/11/gaza-documentary-dropped-by-the-bbc-wins-bafta?traffic_source=rss" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+                  <article class="news-item" data-category="world" data-video="0">
+
+
+      <a class="titlelink" href="https://www.bbc.com/news/articles/ce9pvp210zdo?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener">
+        <span class="kicker blue">
+全球 · BBC World
+        </span>
+        <h3 class="headline">Dua Lipa sues Samsung for $15m over use of her image on TV boxes</h3>
+          <p class="dek">The pop star&#39;s legal team alleges a photograph of her face was used on Samsung television boxes without permission.</p>
+      </a>
+
+      <div class="byline">
+        <span class="source">BBC World</span>
+        <span class="dot">·</span>
+        <span>1 小时前</span>
+        <span class="dot">·</span>
+        <a href="https://www.bbc.com/news/articles/ce9pvp210zdo?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener" style="color: var(--ink-faint); text-decoration: none;">↗ 阅读原文</a>
+      </div>
+    </article>
+
+          </div>
+    </section>
+
+
+  <!-- ============ 页脚 ============ -->
+  <footer>
+    <div class="col">
+      <h4>关于本简报</h4>
+      <p>本页面由 GitHub Actions 每日自动从 RSS 源抓取生成。包含视频卡片的条目可点击播放。若某天某个分区为空，可能是 RSS 源短暂不可达，明天会恢复。</p>
+    </div>
+    <div class="col">
+      <h4>更新机制</h4>
+      <p>每天定时跑 Python 脚本 → 抓 RSS → 渲染 HTML → 推回 GitHub Pages。本页生成于 2026-05-11 12:32。改新闻源、改样式、改时间，编辑 repo 里对应文件即可。</p>
+    </div>
+    <div class="col">
+      <h4>编排</h4>
+      <p>排版：Fraunces × Noto Serif SC × JetBrains Mono。<br>配色：暖牛皮纸 / 朱红 / 深墨。<br>所有图片版权归原所有者，仅作内容引述。</p>
+    </div>
+  </footer>
+
 </div>
+
+<script>
+  // ===== 过滤交互 =====
+  const filters = document.querySelectorAll('.filter-btn');
+  const sections = document.querySelectorAll('.section');
+  const ornament = document.querySelector('.ornament');
+
+  filters.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filters.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+
+      if (f === 'video') {
+        // 只看视频：所有 section 显示，但隐藏非视频条目
+        sections.forEach(s => s.classList.remove('hidden'));
+        document.querySelectorAll('.news-item').forEach(item => {
+          item.style.display = item.dataset.video === '1' ? '' : 'none';
+        });
+      } else {
+        // 普通分类筛选
+        document.querySelectorAll('.news-item').forEach(item => {
+          item.style.display = '';
+        });
+        sections.forEach(sec => {
+          if (f === 'all' || sec.dataset.category === f) {
+            sec.classList.remove('hidden');
+          } else {
+            sec.classList.add('hidden');
+          }
+        });
+      }
+
+      ornament.style.display = (f === 'all') ? 'block' : 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // ===== 视频展开播放 =====
+  function playVideo(el) {
+    if (el.classList.contains('playing')) return;
+    const embed = el.dataset.embed;
+    if (!embed) return;
+    el.classList.add('playing');
+    el.innerHTML = `<iframe src="${embed}?autoplay=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+  }
+</script>
+
 </body>
 </html>
