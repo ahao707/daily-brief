@@ -1,0 +1,69 @@
+# ============================================================
+#  RSS 源配置
+#  想加新闻源？在对应板块下面照样子加一条就行。
+#  keywords_required: true 表示只收 AI 相关条目（用于综合科技源）。
+# ============================================================
+
+ai:
+  # —— AI 专门媒体（全收）——
+  - name: GitHub Blog
+    url: https://github.blog/feed/
+
+  - name: TechCrunch AI
+    url: https://techcrunch.com/category/artificial-intelligence/feed/
+
+  - name: The Verge AI
+    url: https://www.theverge.com/rss/ai-artificial-intelligence/index.xml
+
+  - name: VentureBeat AI
+    url: https://venturebeat.com/category/ai/feed/
+
+  - name: MIT Technology Review AI
+    url: https://www.technologyreview.com/topic/artificial-intelligence/feed
+
+  - name: Anthropic
+    url: https://www.anthropic.com/news/rss.xml
+
+  # —— 综合科技源，但过滤只留 AI 相关 ——
+  - name: Ars Technica
+    url: https://feeds.arstechnica.com/arstechnica/index
+    keywords_required: true
+
+  - name: Hacker News (前页)
+    url: https://hnrss.org/frontpage
+    keywords_required: true
+
+  # —— AI 视频源（YouTube channel feed）——
+  # 频道 ID 在 YouTube 频道页 → 右键查看源码搜 "channelId" 可拿到
+  - name: Two Minute Papers
+    url: https://www.youtube.com/feeds/videos.xml?channel_id=UCbfYPyITQ-7l4upoX8nvctg
+
+  - name: Yannic Kilcher
+    url: https://www.youtube.com/feeds/videos.xml?channel_id=UCZHmQk67mSJgfCCTn7xBfew
+
+world:
+  # —— 主要国际新闻源 ——
+  - name: BBC World
+    url: https://feeds.bbci.co.uk/news/world/rss.xml
+
+  - name: NPR World
+    url: https://feeds.npr.org/1004/rss.xml
+
+  - name: Al Jazeera
+    url: https://www.aljazeera.com/xml/rss/all.xml
+
+  - name: The Guardian World
+    url: https://www.theguardian.com/world/rss
+
+  - name: Reuters World
+    url: https://moxie.foxnews.com/google-publisher/world.xml
+
+  # —— 视频源（YouTube）——
+  - name: BBC News (视频)
+    url: https://www.youtube.com/feeds/videos.xml?channel_id=UC16niRr50-MSBwiO3YDb3RA
+
+  - name: DW News (视频)
+    url: https://www.youtube.com/feeds/videos.xml?channel_id=UCknLrEdhRCp1aegoMqRaCZg
+
+  - name: Al Jazeera English (视频)
+    url: https://www.youtube.com/feeds/videos.xml?channel_id=UCNye-wNBqNL5ZzHSJj3l8Bg
